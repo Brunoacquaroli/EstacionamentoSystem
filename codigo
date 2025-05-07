@@ -1,0 +1,143 @@
+using System;
+using System.Collections.Generic;
+
+class Veiculo
+{
+    public string Modelo { get; set; }
+    public DateTime DataEntrada { get; set; }
+    public double TempoPlanejado { get; set; }  // Tempo planejado (em horas)
+    public double ValorPlanejado { get; set; }  // Valor planejado a pagar
+
+    public Veiculo(string modelo, DateTime dataEntrada, double tempoPlanejado)
+    {
+        Modelo = modelo;
+        DataEntrada = dataEntrada;
+        TempoPlanejado = tempoPlanejado;
+        ValorPlanejado = tempoPlanejado * 5.0;  // R$5 por hora
+    }
+}
+
+class Estacionamento
+{
+    private List<Veiculo> Veiculos = new List<Veiculo>();
+
+    // Método para adicionar veículo
+    public void AdicionarVeiculo()
+    {
+        Console.Write("Digite o modelo do veículo: ");
+        string modelo = Console.ReadLine();
+
+        Console.Write("Quanto tempo você planeja ficar (em horas): ");
+        double tempoPlanejado;
+        while (!double.TryParse(Console.ReadLine(), out tempoPlanejado) || tempoPlanejado <= 0)
+        {
+            Console.Write("Tempo inválido. Por favor, digite um valor maior que 0: ");
+        }
+
+        Veiculos.Add(new Veiculo(modelo, DateTime.Now, tempoPlanejado));
+        double valorPlanejado = tempoPlanejado * 5.0; // R$5 por hora
+        Console.WriteLine($"Veículo {modelo} adicionado. Tempo planejado: {tempoPlanejado} horas.");
+        Console.WriteLine($"Valor planejado a pagar: R${valorPlanejado:F2}");
+    }
+
+    // Método para remover veículo e calcular valor
+    public void RemoverVeiculo()
+    {
+        if (Veiculos.Count == 0)
+        {
+            Console.WriteLine("Nenhum veículo para remover.");
+            return;
+        }
+
+        // Remove o primeiro veículo da lista
+        var veiculo = Veiculos[0];
+
+        // Pergunta ao usuário o tempo real que o veículo ficou estacionado
+        Console.Write("Quanto tempo o veículo ficou estacionado (em horas): ");
+        double tempoReal;
+        while (!double.TryParse(Console.ReadLine(), out tempoReal) || tempoReal <= 0)
+        {
+            Console.Write("Tempo inválido. Por favor, digite um valor maior que 0: ");
+        }
+
+        // Calcula o valor a ser pago com base no tempo real de estacionamento
+        double valorReal = CalcularPagamento(tempoReal);
+        Veiculos.RemoveAt(0);
+
+        // Exibe o valor a ser pago
+        Console.WriteLine($"Veículo {veiculo.Modelo} removido.");
+        Console.WriteLine($"Tempo planejado: {veiculo.TempoPlanejado} horas");
+        Console.WriteLine($"Tempo real: {tempoReal:F2} horas.");
+        Console.WriteLine($"Valor a pagar: R${valorReal:F2}");
+    }
+
+    // Método para listar os veículos
+    public void ListarVeiculos()
+    {
+        if (Veiculos.Count == 0)
+        {
+            Console.WriteLine("Não há veículos estacionados.");
+            return;
+        }
+
+        Console.WriteLine("Veículos estacionados:");
+        foreach (var veiculo in Veiculos)
+        {
+            Console.WriteLine($"Modelo: {veiculo.Modelo}, Data de Entrada: {veiculo.DataEntrada}, Tempo Planejado: {veiculo.TempoPlanejado} horas, Valor Planejado: R${veiculo.ValorPlanejado:F2}");
+        }
+    }
+
+    // Método para calcular o valor de pagamento
+    private double CalcularPagamento(double tempoReal)
+    {
+        // Definindo o valor por hora (R$5 por hora)
+        return tempoReal * 5.0; // R$5 por hora
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Estacionamento estacionamento = new Estacionamento();
+        bool continuar = true;
+
+        while (continuar)
+        {
+            Console.Clear();
+            Console.WriteLine("Sistema de Estacionamento");
+            Console.WriteLine("1 - Adicionar veículo");
+            Console.WriteLine("2 - Remover veículo");
+            Console.WriteLine("3 - Listar veículos");
+            Console.WriteLine("4 - Sair");
+            Console.Write("Escolha uma opção: ");
+            
+            string opcao = Console.ReadLine();
+
+            switch (opcao)
+            {
+                case "1":
+                    estacionamento.AdicionarVeiculo();
+                    break;
+                case "2":
+                    estacionamento.RemoverVeiculo();
+                    break;
+                case "3":
+                    estacionamento.ListarVeiculos();
+                    break;
+                case "4":
+                    continuar = false;
+                    break;
+                default:
+                    Console.WriteLine("Opção inválida. Tente novamente.");
+                    break;
+            }
+
+            // Atraso para o usuário ler a mensagem
+            Console.WriteLine("\nPressione qualquer tecla para continuar...");
+            Console.ReadKey();
+        }
+
+        Console.WriteLine("Sistema encerrado.");
+    }
+}
